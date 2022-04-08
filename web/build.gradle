@@ -1,0 +1,37 @@
+plugins {
+    id 'war'
+    id 'java'
+}
+
+group 'by.us10n'
+version '1.0-SNAPSHOT'
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':repository')
+    implementation project(':service')
+
+    implementation 'org.springframework:spring-webmvc:5.3.7'
+    implementation 'org.springframework:spring-web:5.3.7'
+
+    implementation 'org.springframework:spring-context:5.3.7'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+test {
+    useJUnitPlatform()
+}
