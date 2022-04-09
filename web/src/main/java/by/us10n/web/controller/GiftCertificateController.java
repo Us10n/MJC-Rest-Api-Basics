@@ -22,15 +22,19 @@ public class GiftCertificateController {
     @GetMapping
     @ResponseStatus(HttpStatus.FOUND)
     public List<GiftCertificateDto> readAll() {
-        List<GiftCertificateDto> certificateList = giftCertificateCRUD.readAll();
-        System.out.println(certificateList);
-        return certificateList;
+        return giftCertificateCRUD.readAll();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.FOUND)
     public GiftCertificateDto readById(@PathVariable Long id) {
         return giftCertificateCRUD.readById(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public GiftCertificateDto create(@RequestBody GiftCertificateDto giftCertificateDto){
+        return giftCertificateCRUD.create(giftCertificateDto);
     }
 
 }

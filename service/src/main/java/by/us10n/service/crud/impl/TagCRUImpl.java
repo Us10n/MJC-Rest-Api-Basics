@@ -26,17 +26,15 @@ public class TagCRUImpl implements TagCRU {
 
     @Override
     public TagDto create(TagDto object) {
-        if (object != null) {
-            String tagName = object.getName();
-            if (TagValidatorImpl.getInstance().isNameValid(tagName)
-                    && !tagDao.findByName(tagName).isPresent()) {
-                Tag tagModel = convertToModel(object);
-                Optional<Tag> createdTag = tagDao.create(tagModel);
-                if (createdTag.isPresent()) {
-                    return convertToDto(createdTag.get());
-                }
+        if (isTagDtoValid(object)
+                && !tagDao.findByName(object.getName()).isPresent()) {
+            Tag tagModel = convertToModel(object);
+            Optional<Tag> createdTag = tagDao.create(tagModel);
+            if (createdTag.isPresent()) {
+                return convertToDto(createdTag.get());
             }
         }
+
         throw new ResponseException(HttpStatus.BAD_REQUEST);
     }
 
@@ -78,5 +76,10 @@ public class TagCRUImpl implements TagCRU {
     @Override
     public Tag convertToModel(TagDto tagDto) {
         return new Tag(tagDto.getTagId(), tagDto.getName());
+    }
+
+    private boolean isTagDtoValid(TagDto tagDto) {
+        TagValidatorImpl validator = TagValidatorImpl.getInstance();
+        return tagDto != null && validator.isNameValid(tagDto.getName());
     }
 }

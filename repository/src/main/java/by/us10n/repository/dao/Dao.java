@@ -8,6 +8,8 @@ public interface Dao<T> {
 
     Optional<T> findById(long id);
 
+    Optional<T> findByName(String name);
+
     List<T> findAll();
 
     void delete(long id);
