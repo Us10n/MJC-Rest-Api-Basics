@@ -7,11 +7,15 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static by.us10n.repository.constants.ColumnNames.*;
-import static by.us10n.repository.constants.TableNames.TAGS_HOLDER_TABLE;
+import static by.us10n.repository.constants.ColumnNames.ID;
+import static by.us10n.repository.constants.ColumnNames.NAME;
 import static by.us10n.repository.constants.TableNames.TAGS_TABLE;
 
 @Repository
@@ -19,7 +23,7 @@ public class TagDaoImpl implements TagDao {
 
     private static final String FIND_ALL_QUERY = "SELECT tags.id, tags.name FROM module.tags";
     private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id=?";
-    private static final String FIND_BY_GIFT_CERTIFICATE_ID_QUERY = "SELECT tags.name FROM module.tags " +
+    private static final String FIND_BY_GIFT_CERTIFICATE_ID_QUERY = "SELECT tags.id, tags.name FROM module.tags " +
             "JOIN gift_certificate_tags ON gift_certificate_tags.tag_id=tags.id " +
             "WHERE gift_certificate_id=?";
     private static final String FIND_BY_NAME_QUERY = FIND_ALL_QUERY + " WHERE name=?";
@@ -69,8 +73,8 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<String> findTagsByGiftCertificateId(long id) {
-        return jdbcTemplate.queryForList(FIND_BY_GIFT_CERTIFICATE_ID_QUERY, String.class, id);
+    public List<Tag> findTagsByGiftCertificateId(long id) {
+        return jdbcTemplate.query(FIND_BY_GIFT_CERTIFICATE_ID_QUERY, BeanPropertyRowMapper.newInstance(Tag.class),id);
     }
 
     @Override
@@ -84,6 +88,7 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
         jdbcTemplate.update(DELETE_TAG_HOLDER_BY_ID_QUERY, id);
         jdbcTemplate.update(DELETE_TAG_BY_ID_QUERY, id);

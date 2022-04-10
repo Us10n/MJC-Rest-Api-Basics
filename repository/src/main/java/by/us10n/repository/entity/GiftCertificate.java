@@ -1,5 +1,6 @@
 package by.us10n.repository.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class GiftCertificate {
@@ -8,13 +9,13 @@ public class GiftCertificate {
     private String description;
     private Double price;
     private Integer duration;
-    private Date createDate;
-    private Date lastUpdateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime lastUpdateDate;
 
     public GiftCertificate() {
     }
 
-    public GiftCertificate(long giftCertificateId, String name, String description, Double price, Integer duration, Date createDate, Date lastUpdateDate) {
+    public GiftCertificate(long giftCertificateId, String name, String description, Double price, Integer duration, LocalDateTime createDate, LocalDateTime lastUpdateDate) {
         this.id = giftCertificateId;
         this.name = name;
         this.description = description;
@@ -64,19 +65,19 @@ public class GiftCertificate {
         this.duration = duration;
     }
 
-    public Date getCreateDate() {
+    public LocalDateTime getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
+    public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate;
     }
 
-    public Date getLastUpdateDate() {
+    public LocalDateTime getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
+    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

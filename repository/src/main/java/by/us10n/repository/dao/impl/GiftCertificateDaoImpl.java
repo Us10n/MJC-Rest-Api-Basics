@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +22,12 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String FIND_ALL_QUERY = "SELECT gift_certificates.id, gift_certificates.name, gift_certificates.description, gift_certificates.price, " +
             "gift_certificates.duration, gift_certificates.create_date, gift_certificates.last_update_date " +
             "FROM module.gift_certificates";
-    private static final String FIND_ALL_WITH_TAGS_QUERY = FIND_ALL_QUERY + " JOIN gift_certificate_tags ON gift_certificates.id=gift_certificate_tags.gift_certificate_id " +
-            "JOIN tags ON gift_certificate_tags.tag_id=tags.id";
     private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id=?";
     private static final String FIND_BY_NAME_QUERY = FIND_ALL_QUERY + " WHERE name=?";
-
+    private static final String DELETE_TAG_HOLDER_BY_ID_QUERY = "DELETE FROM module.gift_certificate_tags WHERE gift_certificate_id=?";
+    private static final String DELETE_GIFT_CERTIFICATE_BY_ID_QUERY = "DELETE FROM module.gift_certificates WHERE id=?";
+    private static final String UPDATE_GIFT_CERTIFICATE_BY_ID_QUERY = "UPDATE module.gift_certificates SET name=?, description=?, price=?," +
+            " duration=?, create_date=?, last_update_date=? WHERE id=?";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -81,7 +83,16 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
+    @Transactional
     public void delete(long id) {
+        jdbcTemplate.update(DELETE_TAG_HOLDER_BY_ID_QUERY, id);
+        jdbcTemplate.update(DELETE_GIFT_CERTIFICATE_BY_ID_QUERY, id);
+    }
 
+    @Override
+    public Optional<GiftCertificate> update(GiftCertificate object) {
+        jdbcTemplate.update(UPDATE_GIFT_CERTIFICATE_BY_ID_QUERY, object.getName(), object.getDescription(),
+                object.getPrice(), object.getDuration(), object.getCreateDate(), object.getLastUpdateDate(), object.getId());
+        return findById(object.getId());
     }
 }

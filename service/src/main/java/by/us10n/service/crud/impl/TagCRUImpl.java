@@ -39,11 +39,6 @@ public class TagCRUImpl implements TagCRU {
     }
 
     @Override
-    public List<TagDto> createAll(List<TagDto> objects) {
-        return objects.stream().map(this::create).collect(Collectors.toList());
-    }
-
-    @Override
     public List<TagDto> readAll() {
         return tagDao.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
     }

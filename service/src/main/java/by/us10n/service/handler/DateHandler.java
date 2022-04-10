@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 @Component
 public class DateHandler {
-    public LocalDate getCurrentDate() {
+    public LocalDateTime getCurrentDate() {
         LocalDateTime localDateTime = LocalDateTime.now();
-        return localDateTime.toLocalDate();
+        return localDateTime;
     }
 }

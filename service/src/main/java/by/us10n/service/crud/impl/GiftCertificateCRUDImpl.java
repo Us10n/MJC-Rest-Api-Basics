@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,17 +45,16 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
                 && !giftCertificateDao.findByName(object.getName()).isPresent()
                 && isTagListValid(object.getTags())) {
             GiftCertificate certificateModel = convertToModel(object);
-            Date currentDate = Date.valueOf(dateHandler.getCurrentDate());
+            LocalDateTime currentDate = dateHandler.getCurrentDate();
             certificateModel.setCreateDate(currentDate);
             certificateModel.setLastUpdateDate(currentDate);
 
             Optional<GiftCertificate> createdCertificateOptional = giftCertificateDao.create(certificateModel);
-            List<Tag> createdTags = createTagsIfNotExist(object.getTags());
-
-            if (createdCertificateOptional.isPresent() && !createdTags.isEmpty()) {
+            List<Tag> tagsToAttach = createTagsIfNotExist(object.getTags());
+            if (createdCertificateOptional.isPresent() && !tagsToAttach.isEmpty()) {
                 GiftCertificate createdCertificate = createdCertificateOptional.get();
-                createdTags.forEach(tag -> {
-                    tagDao.attachTagToCertificate(createdCertificate.getId(), tag.getName());
+                tagsToAttach.forEach(tag -> {
+                    tagDao.attachTagToCertificate(createdCertificate.getId(), tag.getId());
                 });
                 return readById(createdCertificate.getId());
             }
@@ -64,18 +64,15 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
     }
 
     @Override
-    public List<GiftCertificateDto> createAll(List<GiftCertificateDto> objects) {
-        return null;
-    }
-
-    @Override
     public List<GiftCertificateDto> readAll() {
         List<GiftCertificateDto> certificateList = giftCertificateDao.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
         if (certificateList.isEmpty()) {
             throw new ResponseException(HttpStatus.NOT_FOUND);
         }
         certificateList.forEach(it -> {
-            List<String> tags = tagDao.findTagsByGiftCertificateId(it.getGiftCertificateId());
+            List<String> tags = tagDao.findTagsByGiftCertificateId(it.getGiftCertificateId())
+                    .stream().map(Tag::getName)
+                    .collect(Collectors.toList());
             it.setTags(tags);
         });
         return certificateList;
@@ -87,18 +84,54 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
         if (!optionalGitCertificate.isPresent()) {
             throw new ResponseException(HttpStatus.NOT_FOUND);
         }
-        List<String> tags = tagDao.findTagsByGiftCertificateId(optionalGitCertificate.get().getId());
+        List<String> tags = tagDao.findTagsByGiftCertificateId(optionalGitCertificate.get().getId())
+                .stream().map(Tag::getName)
+                .collect(Collectors.toList());
         return convertToDto(optionalGitCertificate.get(), tags);
     }
 
     @Override
     public GiftCertificateDto update(GiftCertificateDto object) {
-        return null;
+        if (object != null) {
+            //copy values from existing certificate
+            GiftCertificateDto currentCertificate = readById(object.getGiftCertificateId());
+            if (object.getName() == null) object.setName(currentCertificate.getName());
+            if (object.getDescription() == null) object.setDescription(currentCertificate.getDescription());
+            if (object.getDuration() == null) object.setDuration(currentCertificate.getDuration());
+            if (object.getPrice() == null) object.setPrice(currentCertificate.getPrice());
+            if (object.getCreateDate() == null) object.setCreateDate(currentCertificate.getCreateDate());
+            if (object.getTags() == null) object.setTags(currentCertificate.getTags());
+
+            GiftCertificate certificateModel = convertToModel(object);
+            LocalDateTime currentDate = dateHandler.getCurrentDate();
+            certificateModel.setLastUpdateDate(currentDate);
+            Optional<GiftCertificate> updatedCertificate = giftCertificateDao.update(certificateModel);
+            List<Tag> tagToAttach = createTagsIfNotExist(object.getTags());
+
+            if (updatedCertificate.isPresent() && !tagToAttach.isEmpty() && isTagListValid(object.getTags())) {
+                //detach all tags from updating certificate
+                tagDao.findTagsByGiftCertificateId(object.getGiftCertificateId()).forEach(
+                        tag -> tagDao.detachTagFromCertificate(object.getGiftCertificateId(), tag.getId())
+                );
+                //attach new tags
+                tagToAttach.forEach(tag ->
+                        tagDao.attachTagToCertificate(object.getGiftCertificateId(), tag.getId())
+                );
+                updatedCertificate = giftCertificateDao.findById(object.getGiftCertificateId());
+                if (updatedCertificate.isPresent()) {
+                    return convertToDto(updatedCertificate.get(), tagToAttach.stream().map(Tag::getName).collect(Collectors.toList()));
+                }
+            }
+        }
+        throw new ResponseException(HttpStatus.NOT_FOUND);
     }
 
     @Override
     public void delete(long id) {
-
+        if (!giftCertificateDao.findById(id).isPresent()) {
+            throw new ResponseException(HttpStatus.NOT_FOUND);
+        }
+        giftCertificateDao.delete(id);
     }
 
     @Override
@@ -143,15 +176,20 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
                 .map(Tag::new)
                 .collect(Collectors.toList());
         List<Tag> existingTags = tagDao.findAll();
+        List<Tag> tagsToAttach = new ArrayList<>();
         uniqueTags.forEach(uniqueTag -> {
             boolean isAlreadyExists = existingTags.stream().anyMatch(existingTag -> {
-                return existingTag.getName().equals(uniqueTag.getName());
+                boolean equalityFlag = existingTag.getName().equals(uniqueTag.getName());
+                if (equalityFlag) {
+                    tagsToAttach.add(existingTag);
+                }
+                return equalityFlag;
             });
             if (!isAlreadyExists) {
-                tagDao.create(uniqueTag);
+                tagDao.create(uniqueTag).ifPresent(tagsToAttach::add);
             }
         });
-        return uniqueTags;
+        return tagsToAttach;
     }
 
     private boolean isTagListValid(List<String> tags) {
