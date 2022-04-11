@@ -18,8 +18,8 @@ public class GiftCertificateDto {
     }
 
     public GiftCertificateDto(long giftCertificateId, String name, String description,
-                              Double price, Integer duration, Date createDate,
-                              Date lastUpdateDate, List<String> tags) {
+                              Double price, Integer duration, LocalDateTime createDate,
+                              LocalDateTime lastUpdateDate, List<String> tags) {
         this.giftCertificateId = giftCertificateId;
         this.name = name;
         this.description = description;
