@@ -2,14 +2,11 @@ package com.epam.esm.service.crud;
 
 import com.epam.esm.repository.dao.GiftCertificateDao;
 import com.epam.esm.repository.dao.TagDao;
-import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.service.config.ServiceConfigTest;
-import com.epam.esm.service.crud.impl.GiftCertificateCRUDImpl;
 import com.epam.esm.service.crud.impl.TagCRUImpl;
 import com.epam.esm.service.dto.TagDto;
 import com.epam.esm.service.exception.ResponseException;
-import com.epam.esm.service.handler.DateHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -21,13 +18,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @ActiveProfiles("test")

@@ -7,7 +7,6 @@ import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.service.config.ServiceConfigTest;
 import com.epam.esm.service.criteria.GiftCertificateCriteria;
 import com.epam.esm.service.crud.impl.GiftCertificateCRUDImpl;
-import com.epam.esm.service.crud.impl.TagCRUImpl;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.exception.ResponseException;
 import com.epam.esm.service.handler.DateHandler;
@@ -80,8 +79,7 @@ class GiftCertificateCRUDImplTest {
 
         tags.remove(2);
 
-        TagCRU tagCru = new TagCRUImpl(tagDao);
-        giftCertificateCRUD = new GiftCertificateCRUDImpl(giftCertificateDao, tagDao, tagCru, new DateHandler());
+        giftCertificateCRUD = new GiftCertificateCRUDImpl(giftCertificateDao, tagDao, new DateHandler());
 
         sampleDto = giftCertificateCRUD.convertToDto(sample, tags.stream().map(Tag::getName).collect(Collectors.toList()));
     }

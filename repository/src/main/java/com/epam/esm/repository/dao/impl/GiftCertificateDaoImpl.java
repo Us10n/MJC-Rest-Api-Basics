@@ -1,9 +1,9 @@
 package com.epam.esm.repository.dao.impl;
 
-import com.epam.esm.repository.dao.GiftCertificateDao;
-import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.constants.ColumnNames;
 import com.epam.esm.repository.constants.TableNames;
+import com.epam.esm.repository.dao.GiftCertificateDao;
+import com.epam.esm.repository.entity.GiftCertificate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,6 +27,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String DELETE_GIFT_CERTIFICATE_BY_ID_QUERY = "DELETE FROM module.gift_certificates WHERE id=?";
     private static final String UPDATE_GIFT_CERTIFICATE_BY_ID_QUERY = "UPDATE module.gift_certificates SET name=?, description=?, price=?," +
             " duration=?, create_date=?, last_update_date=? WHERE id=?";
+    private static final String SCHEMA_NAME = "module";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -40,6 +41,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         Optional<GiftCertificate> createdCertificate = Optional.empty();
         try {
             Map<String, Object> keys = new SimpleJdbcInsert(this.jdbcTemplate)
+                    .withSchemaName(SCHEMA_NAME)
                     .withTableName(TableNames.GIFT_CERTIFICATES_TABLE)
                     .usingColumns(ColumnNames.NAME, ColumnNames.DESCRIPTION, ColumnNames.PRICE, ColumnNames.DURATION, ColumnNames.CREATE_DATE, ColumnNames.LAST_UPDATE_DATE)
                     .usingGeneratedKeyColumns(ColumnNames.ID)

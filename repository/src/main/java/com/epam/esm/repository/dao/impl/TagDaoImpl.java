@@ -22,15 +22,14 @@ public class TagDaoImpl implements TagDao {
     private static final String FIND_ALL_QUERY = "SELECT tags.id, tags.name FROM module.tags";
     private static final String FIND_BY_ID_QUERY = FIND_ALL_QUERY + " WHERE id=?";
     private static final String FIND_BY_GIFT_CERTIFICATE_ID_QUERY = "SELECT tags.id, tags.name FROM module.tags " +
-            "JOIN gift_certificate_tags ON gift_certificate_tags.tag_id=tags.id " +
+            "JOIN module.gift_certificate_tags ON gift_certificate_tags.tag_id=tags.id " +
             "WHERE gift_certificate_id=?";
     private static final String FIND_BY_NAME_QUERY = FIND_ALL_QUERY + " WHERE name=?";
     private static final String DELETE_TAG_HOLDER_BY_ID_QUERY = "DELETE FROM module.gift_certificate_tags WHERE tag_id=?";
     private static final String DELETE_TAG_BY_ID_QUERY = "DELETE FROM module.tags WHERE id=?";
     private static final String ATTACH_TAG_BY_ID_QUERY = "INSERT INTO module.gift_certificate_tags (gift_certificate_id, tag_id) VALUES (?, ?)";
-    private static final String ATTACH_TAG_BY_NAME_QUERY = "INSERT INTO module.gift_certificate_tags (gift_certificate_id, tag_id) VALUES (?, (SELECT tags.id FROM module.tags WHERE tags.name=?))";
     private static final String DETACH_TAG_BY_ID_QUERY = "DELETE FROM module.gift_certificate_tags WHERE gift_certificate_id=? AND tag_id=?";
-    private static final String DETACH_TAG_BY_NAME_QUERY = "DELETE FROM module.gift_certificate_tags WHERE = gift_certificate_id=? AND tag_id=(SELECT tags.id FROM module.tags WHERE tags.name=?)";
+    private static final String SCHEMA_NAME = "module";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -44,6 +43,7 @@ public class TagDaoImpl implements TagDao {
         Optional<Tag> createdTag = Optional.empty();
         try {
             Map<String, Object> keys = new SimpleJdbcInsert(this.jdbcTemplate)
+                    .withSchemaName(SCHEMA_NAME)
                     .withTableName(TableNames.TAGS_TABLE)
                     .usingColumns(ColumnNames.NAME)
                     .usingGeneratedKeyColumns(ColumnNames.ID)
@@ -72,7 +72,7 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public List<Tag> findTagsByGiftCertificateId(long id) {
-        return jdbcTemplate.query(FIND_BY_GIFT_CERTIFICATE_ID_QUERY, BeanPropertyRowMapper.newInstance(Tag.class),id);
+        return jdbcTemplate.query(FIND_BY_GIFT_CERTIFICATE_ID_QUERY, BeanPropertyRowMapper.newInstance(Tag.class), id);
     }
 
     @Override
@@ -98,17 +98,7 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public void attachTagToCertificate(long certificateId, String tagName) {
-        jdbcTemplate.update(ATTACH_TAG_BY_NAME_QUERY, certificateId, tagName);
-    }
-
-    @Override
     public void detachTagFromCertificate(long certificateId, long tagId) {
         jdbcTemplate.update(DETACH_TAG_BY_ID_QUERY, certificateId, tagId);
-    }
-
-    @Override
-    public void detachTagFromCertificate(long certificateId, String tagName) {
-        jdbcTemplate.update(DETACH_TAG_BY_NAME_QUERY, certificateId, tagName);
     }
 }

@@ -31,8 +31,8 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
     private static final String FIND_ALL_QUERY = "SELECT DISTINCT gift_certificates.id, gift_certificates.name, gift_certificates.description, gift_certificates.price, " +
             "gift_certificates.duration, gift_certificates.create_date, gift_certificates.last_update_date " +
             "FROM module.gift_certificates " +
-            "JOIN gift_certificate_tags ON gift_certificates.id=gift_certificate_tags.gift_certificate_id " +
-            "JOIN tags ON gift_certificate_tags.tag_id=tags.id ";
+            "JOIN module.gift_certificate_tags ON gift_certificates.id=gift_certificate_tags.gift_certificate_id " +
+            "JOIN module.tags ON gift_certificate_tags.tag_id=tags.id ";
     private static final String FIND_BY_TAG_NAME_QUERY = " tags.name='%s' ";
     private static final String FIND_BY_PART_NAME_QUERY = " gift_certificates.name like concat('%s', '%%') ";
     private static final String FIND_BY_PART_DESC_QUERY = " gift_certificates.description like concat('%s', '%%') ";
@@ -43,13 +43,11 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
     private GiftCertificateDao giftCertificateDao;
     private TagDao tagDao;
     private DateHandler dateHandler;
-    private TagCRU tagCRU;
 
     @Autowired
-    public GiftCertificateCRUDImpl(GiftCertificateDao giftCertificateDao, TagDao tagDao, TagCRU tagCRU, DateHandler dateHandler) {
+    public GiftCertificateCRUDImpl(GiftCertificateDao giftCertificateDao, TagDao tagDao, DateHandler dateHandler) {
         this.giftCertificateDao = giftCertificateDao;
         this.tagDao = tagDao;
-        this.tagCRU = tagCRU;
         this.dateHandler = dateHandler;
     }
 

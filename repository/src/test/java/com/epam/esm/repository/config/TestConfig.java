@@ -1,6 +1,5 @@
 package com.epam.esm.repository.config;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -11,14 +10,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@ComponentScan(basePackages = "by.us10n.repository")
+@ComponentScan(basePackages = "com.epam.esm")
 public class TestConfig {
 
     @Bean
     @Profile("test")
     public DataSource dataSource() {
-        HikariConfig hikariConfig = new HikariConfig("/test.properties");
-        return new HikariDataSource(hikariConfig);
+        HikariDataSource hikariDataSource = new HikariDataSource();
+        hikariDataSource.setDriverClassName("org.h2.Driver");
+        hikariDataSource.setJdbcUrl("jdbc:h2:mem:test");
+        return hikariDataSource;
     }
 
     @Bean

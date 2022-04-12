@@ -2,10 +2,7 @@ package com.epam.esm.service.validator;
 
 import com.epam.esm.service.validator.impl.TagValidatorImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class TagValidatorImplTest {
 
