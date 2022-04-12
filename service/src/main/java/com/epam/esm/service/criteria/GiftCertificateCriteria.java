@@ -15,7 +15,8 @@ public class GiftCertificateCriteria {
     public GiftCertificateCriteria() {
     }
 
-    public GiftCertificateCriteria(String tagName, String partName, String partDesc, String sortBy, String sortOrder) {
+    public GiftCertificateCriteria(String tagName, String partName,
+                                   String partDesc, String sortBy, String sortOrder) {
         this.tagName = tagName;
         this.partName = partName;
         this.partDesc = partDesc;

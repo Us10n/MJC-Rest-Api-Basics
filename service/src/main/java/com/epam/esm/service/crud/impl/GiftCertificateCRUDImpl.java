@@ -186,7 +186,7 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
             Optional<GiftCertificate> updatedCertificate = giftCertificateDao.update(certificateModel);
             List<Tag> tagToAttach = createTagsIfNotExist(object.getTags());
 
-            if (updatedCertificate.isPresent() && !tagToAttach.isEmpty() && isTagListValid(object.getTags())) {
+            if (updatedCertificate.isPresent() && isTagListValid(object.getTags())) {
                 //detach all tags from updating certificate
                 tagDao.findTagsByGiftCertificateId(object.getGiftCertificateId()).forEach(
                         tag -> tagDao.detachTagFromCertificate(object.getGiftCertificateId(), tag.getId())
@@ -275,6 +275,6 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
     }
 
     private boolean isTagListValid(List<String> tags) {
-        return tags != null && tags.stream().allMatch(TagValidatorImpl.getInstance()::isNameValid);
+        return tags != null && (tags.stream().allMatch(TagValidatorImpl.getInstance()::isNameValid) || tags.isEmpty());
     }
 }

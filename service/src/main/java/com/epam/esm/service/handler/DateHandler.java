@@ -2,7 +2,6 @@ package com.epam.esm.service.handler;
 
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Component

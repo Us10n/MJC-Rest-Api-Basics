@@ -12,6 +12,6 @@ public class TagValidatorImpl implements TagValidator {
 
     @Override
     public boolean isNameValid(String name) {
-        return name != null && name.length() > MIN_LENGTH;
+        return name != null && name.length() >= MIN_LENGTH;
     }
 }

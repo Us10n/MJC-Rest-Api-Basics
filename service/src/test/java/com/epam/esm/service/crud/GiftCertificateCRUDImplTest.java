@@ -9,6 +9,7 @@ import com.epam.esm.service.criteria.GiftCertificateCriteria;
 import com.epam.esm.service.crud.impl.GiftCertificateCRUDImpl;
 import com.epam.esm.service.crud.impl.TagCRUImpl;
 import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.service.exception.ResponseException;
 import com.epam.esm.service.handler.DateHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,7 +45,7 @@ class GiftCertificateCRUDImplTest {
 
     private GiftCertificateCRUD giftCertificateCRUD;
     private GiftCertificateDto sampleDto;
-    private GiftCertificateDto updatedSampleDto;
+    List<Tag> tags = new ArrayList<>();
 
     @BeforeAll
     public void setup() {
@@ -59,7 +60,7 @@ class GiftCertificateCRUDImplTest {
         );
 
         findAllList.add(sample);
-        List<Tag> tags = new ArrayList<>();
+
         tags.add(new Tag(1, "funny"));
         tags.add(new Tag(2, "useful"));
         tags.add(new Tag(3, "great"));
@@ -74,8 +75,8 @@ class GiftCertificateCRUDImplTest {
         Mockito.when(giftCertificateDao.findAll()).thenReturn(findAllList);
         Mockito.when(giftCertificateDao.findByCriteria(Mockito.any(String.class))).thenReturn(findAllList);
 
+        Mockito.when(giftCertificateDao.update(Mockito.any(GiftCertificate.class))).thenReturn(Optional.of(updatedSample));
         Mockito.when(giftCertificateDao.create(Mockito.any(GiftCertificate.class))).thenReturn(Optional.of(sample));
-        Mockito.when(giftCertificateDao.update(Mockito.any())).thenReturn(Optional.of(updatedSample));
 
         tags.remove(2);
 
@@ -83,7 +84,6 @@ class GiftCertificateCRUDImplTest {
         giftCertificateCRUD = new GiftCertificateCRUDImpl(giftCertificateDao, tagDao, tagCru, new DateHandler());
 
         sampleDto = giftCertificateCRUD.convertToDto(sample, tags.stream().map(Tag::getName).collect(Collectors.toList()));
-        updatedSampleDto = giftCertificateCRUD.convertToDto(updatedSample, updatedTags.stream().map(Tag::getName).collect(Collectors.toList()));
     }
 
     @Test
@@ -106,33 +106,77 @@ class GiftCertificateCRUDImplTest {
 
     @Test
     void readByCriteria() {
-        GiftCertificateCriteria criteria = new GiftCertificateCriteria();
+        GiftCertificateCriteria criteria = new GiftCertificateCriteria(
+                "tag", "partName",
+                "description", "name", "asc"
+        );
         GiftCertificateDto actual = giftCertificateCRUD.readByCriteria(criteria).get(0);
-        Assertions.assertEquals(actual,sampleDto);
+        Assertions.assertEquals(actual, sampleDto);
+    }
+
+    @Test
+    void deletePositive() {
+        Assertions.assertDoesNotThrow(() -> {
+            giftCertificateCRUD.delete(1);
+        });
+    }
+
+    @Test
+    void deleteNegative() {
+        Assertions.assertThrows(ResponseException.class, () -> {
+            giftCertificateCRUD.delete(2);
+        });
     }
 
     @Test
     void update() {
-        GiftCertificateDto newCertificate=new GiftCertificateDto(
-                1, "upd", "upd", 1.1, 1, dateHandler.getCurrentDate(), dateHandler.getCurrentDate(),new ArrayList<>()
+        GiftCertificateDto newCertificate = new GiftCertificateDto(
+                1, "upd", "upd", 1.1, 1, dateHandler.getCurrentDate(),
+                dateHandler.getCurrentDate(), tags.stream().map(Tag::getName).collect(Collectors.toList())
         );
-        GiftCertificateDto actual =giftCertificateCRUD.update(newCertificate);
-        Assertions.assertEquals(actual,updatedSampleDto);
-    }
-
-    @Test
-    void delete() {
+        GiftCertificateDto actual = giftCertificateCRUD.update(newCertificate);
+        GiftCertificateDto expected = new GiftCertificateDto(
+                1, "test1", "test1", 1.2, 1, dateHandler.getCurrentDate(),
+                dateHandler.getCurrentDate(), tags.stream().map(Tag::getName).collect(Collectors.toList())
+        );
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void convertToDto() {
+        GiftCertificate sample = new GiftCertificate(
+                1, "test1", "test1", 1.2, 1, dateHandler.getCurrentDate(), dateHandler.getCurrentDate()
+        );
+        GiftCertificateDto expected = new GiftCertificateDto(sample.getId(), sample.getName(), sample.getDescription(),
+                sample.getPrice(), sample.getDuration(), sample.getCreateDate(), sample.getLastUpdateDate(), null);
+        GiftCertificateDto actual = giftCertificateCRUD.convertToDto(sample);
+        Assertions.assertEquals(actual, expected);
     }
 
     @Test
     void testConvertToDto() {
+        GiftCertificate sample = new GiftCertificate(
+                1, "test1", "test1", 1.2, 1, dateHandler.getCurrentDate(), dateHandler.getCurrentDate()
+        );
+        List<String> tags = new ArrayList<>();
+        tags.add("funny");
+        tags.add("useful");
+        tags.add("great");
+
+        GiftCertificateDto expected = new GiftCertificateDto(sample.getId(), sample.getName(), sample.getDescription(),
+                sample.getPrice(), sample.getDuration(), sample.getCreateDate(), sample.getLastUpdateDate(),
+                tags);
+        GiftCertificateDto actual = giftCertificateCRUD.convertToDto(sample, tags);
+        Assertions.assertEquals(actual, expected);
     }
 
     @Test
     void convertToModel() {
+        GiftCertificate expected = new GiftCertificate(
+                1, "test1", "test1", 1.2, 1, dateHandler.getCurrentDate(), dateHandler.getCurrentDate()
+        );
+        GiftCertificate actual = giftCertificateCRUD.convertToModel(sampleDto);
+        actual.setLastUpdateDate(actual.getCreateDate());
+        Assertions.assertEquals(expected, actual);
     }
 }
