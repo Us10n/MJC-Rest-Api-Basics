@@ -37,6 +37,6 @@ public class DaoConfig {
     @Bean
     @Profile("prod")
     public JdbcTemplate jdbcTemplateProd() {
-        return new JdbcTemplate(dataSource());
+        return new JdbcTemplate(dataSourceProd());
     }
 }
