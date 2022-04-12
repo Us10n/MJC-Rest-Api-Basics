@@ -1,5 +1,8 @@
 package com.epam.esm.repository.constants;
 
+/**
+ * Class that contains column names
+ */
 public final class ColumnNames {
     public static final String ID = "id";
     public static final String GIFT_CERTIFICATE_ID = "gift_certificate_id";

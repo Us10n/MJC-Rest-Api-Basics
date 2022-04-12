@@ -3,6 +3,9 @@ package com.epam.esm.service.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Data transfer object form GiftCertificate
+ */
 public class GiftCertificateDto {
     private long giftCertificateId;
     private String name;
@@ -13,9 +16,24 @@ public class GiftCertificateDto {
     private String lastUpdateDate;
     private List<String> tags;
 
+    /**
+     * Instantiates a new Gift certificate dto.
+     */
     public GiftCertificateDto() {
     }
 
+    /**
+     * Instantiates a new Gift certificate dto.
+     *
+     * @param giftCertificateId the gift certificate id
+     * @param name              the name
+     * @param description       the description
+     * @param price             the price
+     * @param duration          the duration
+     * @param createDate        the create date
+     * @param lastUpdateDate    the last update date
+     * @param tags              the tags
+     */
     public GiftCertificateDto(long giftCertificateId, String name, String description,
                               Double price, Integer duration, LocalDateTime createDate,
                               LocalDateTime lastUpdateDate, List<String> tags) {
@@ -29,70 +47,155 @@ public class GiftCertificateDto {
         this.tags = tags;
     }
 
+    /**
+     * Gets gift certificate id.
+     *
+     * @return the gift certificate id
+     */
     public long getGiftCertificateId() {
         return giftCertificateId;
     }
 
+    /**
+     * Sets gift certificate id.
+     *
+     * @param giftCertificateId the gift certificate id
+     */
     public void setGiftCertificateId(long giftCertificateId) {
         this.giftCertificateId = giftCertificateId;
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets description.
+     *
+     * @return the description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Sets description.
+     *
+     * @param description the description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Gets price.
+     *
+     * @return the price
+     */
     public Double getPrice() {
         return price;
     }
 
+    /**
+     * Sets price.
+     *
+     * @param price the price
+     */
     public void setPrice(Double price) {
         this.price = price;
     }
 
+    /**
+     * Gets duration.
+     *
+     * @return the duration
+     */
     public Integer getDuration() {
         return duration;
     }
 
+    /**
+     * Sets duration.
+     *
+     * @param duration the duration
+     */
     public void setDuration(Integer duration) {
         this.duration = duration;
     }
 
+    /**
+     * Gets create date.
+     *
+     * @return the create date
+     */
     public String getCreateDate() {
         return createDate;
     }
 
+    /**
+     * Sets create date.
+     *
+     * @param createDate the create date
+     */
     public void setCreateDate(LocalDateTime createDate) {
         this.createDate = createDate.toString();
     }
 
+    /**
+     * Sets create date.
+     *
+     * @param createDate the create date
+     */
     public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 
+    /**
+     * Gets last update date.
+     *
+     * @return the last update date
+     */
     public String getLastUpdateDate() {
         return lastUpdateDate;
     }
 
+    /**
+     * Sets last update date.
+     *
+     * @param lastUpdateDate the last update date
+     */
     public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate.toString();
     }
 
+    /**
+     * Gets tags.
+     *
+     * @return the tags
+     */
     public List<String> getTags() {
         return tags;
     }
 
+    /**
+     * Sets tags.
+     *
+     * @param tags the tags
+     */
     public void setTags(List<String> tags) {
         this.tags = tags;
     }

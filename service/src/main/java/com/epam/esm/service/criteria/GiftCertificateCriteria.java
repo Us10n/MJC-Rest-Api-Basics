@@ -1,9 +1,24 @@
 package com.epam.esm.service.criteria;
 
+/**
+ * Class that used to hold find criteria.
+ */
 public class GiftCertificateCriteria {
+    /**
+     * The constant ASC.
+     */
     public static final String ASC = "ASC";
+    /**
+     * The constant DESC.
+     */
     public static final String DESC = "DESC";
+    /**
+     * The constant NAME.
+     */
     public static final String NAME = "name";
+    /**
+     * The constant DATE.
+     */
     public static final String DATE = "date";
 
     private String tagName;
@@ -12,9 +27,21 @@ public class GiftCertificateCriteria {
     private String sortBy;
     private String sortOrder = ASC;
 
+    /**
+     * Instantiates a new Gift certificate criteria.
+     */
     public GiftCertificateCriteria() {
     }
 
+    /**
+     * Instantiates a new Gift certificate criteria.
+     *
+     * @param tagName   the tag name
+     * @param partName  the part name
+     * @param partDesc  the part desc
+     * @param sortBy    the sort by
+     * @param sortOrder the sort order
+     */
     public GiftCertificateCriteria(String tagName, String partName,
                                    String partDesc, String sortBy, String sortOrder) {
         this.tagName = tagName;
@@ -24,46 +51,101 @@ public class GiftCertificateCriteria {
         this.sortOrder = sortOrder;
     }
 
+    /**
+     * Gets tag name.
+     *
+     * @return the tag name
+     */
     public String getTagName() {
         return tagName;
     }
 
+    /**
+     * Sets tag name.
+     *
+     * @param tagName the tag name
+     */
     public void setTagName(String tagName) {
         this.tagName = tagName;
     }
 
+    /**
+     * Gets part name.
+     *
+     * @return the part name
+     */
     public String getPartName() {
         return partName;
     }
 
+    /**
+     * Sets part name.
+     *
+     * @param partName the part name
+     */
     public void setPartName(String partName) {
         this.partName = partName;
     }
 
+    /**
+     * Gets part desc.
+     *
+     * @return the part desc
+     */
     public String getPartDesc() {
         return partDesc;
     }
 
+    /**
+     * Sets part desc.
+     *
+     * @param partDesc the part desc
+     */
     public void setPartDesc(String partDesc) {
         this.partDesc = partDesc;
     }
 
+    /**
+     * Gets sort by.
+     *
+     * @return the sort by
+     */
     public String getSortBy() {
         return sortBy;
     }
 
+    /**
+     * Sets sort by.
+     *
+     * @param sortBy the sort by
+     */
     public void setSortBy(String sortBy) {
         this.sortBy = sortBy;
     }
 
+    /**
+     * Gets sort order.
+     *
+     * @return the sort order
+     */
     public String getSortOrder() {
         return sortOrder;
     }
 
+    /**
+     * Sets sort order.
+     *
+     * @param sortOrder the sort order
+     */
     public void setSortOrder(String sortOrder) {
         this.sortOrder = sortOrder;
     }
 
+    /**
+     * Is empty boolean.
+     *
+     * @return the boolean
+     */
     public boolean isEmpty() {
         return tagName == null && partName == null && partDesc == null && sortBy == null && sortOrder == null;
     }
