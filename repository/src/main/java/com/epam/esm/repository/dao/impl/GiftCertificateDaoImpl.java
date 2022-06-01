@@ -27,7 +27,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String DELETE_GIFT_CERTIFICATE_BY_ID_QUERY = "DELETE FROM module.gift_certificates WHERE id=?";
     private static final String UPDATE_GIFT_CERTIFICATE_BY_ID_QUERY = "UPDATE module.gift_certificates SET name=?, description=?, price=?," +
             " duration=?, create_date=?, last_update_date=? WHERE id=?";
-    private static final String SCHEMA_NAME = "module";
+    private final String SCHEMA_NAME = "module";
 
     private final JdbcTemplate jdbcTemplate;
 

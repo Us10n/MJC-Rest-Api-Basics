@@ -1,7 +1,5 @@
 package com.epam.esm.repository.constants;
 
-import java.util.Optional;
-
 /**
  * Class that contains table names
  */

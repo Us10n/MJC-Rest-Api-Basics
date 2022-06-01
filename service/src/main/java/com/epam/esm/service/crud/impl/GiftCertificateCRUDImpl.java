@@ -7,7 +7,6 @@ import com.epam.esm.repository.entity.GiftCertificate;
 import com.epam.esm.repository.entity.Tag;
 import com.epam.esm.service.criteria.GiftCertificateCriteria;
 import com.epam.esm.service.crud.GiftCertificateCRUD;
-import com.epam.esm.service.crud.TagCRU;
 import com.epam.esm.service.dto.GiftCertificateDto;
 import com.epam.esm.service.exception.ResponseException;
 import com.epam.esm.service.handler.DateHandler;
@@ -176,26 +175,33 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
             GiftCertificate certificateModel;
             try {
                 certificateModel = convertToModel(object);
+                LocalDateTime currentDate = dateHandler.getCurrentDate();
+                certificateModel.setLastUpdateDate(currentDate);
+                certificateModel.setCreateDate(LocalDateTime.parse(object.getCreateDate()));
             } catch (DateTimeParseException e) {
                 throw new ResponseException(HttpStatus.BAD_REQUEST, new Object[]{object.getCreateDate()});
             }
-            LocalDateTime currentDate = dateHandler.getCurrentDate();
-            certificateModel.setLastUpdateDate(currentDate);
             Optional<GiftCertificate> updatedCertificate = giftCertificateDao.update(certificateModel);
-            List<Tag> tagToAttach = createTagsIfNotExist(object.getTags());
+            List<Tag> newTags = createTagsIfNotExist(object.getTags());
 
             if (updatedCertificate.isPresent() && isTagListValid(object.getTags())) {
-                //detach all tags from updating certificate
-                tagDao.findTagsByGiftCertificateId(object.getGiftCertificateId()).forEach(
-                        tag -> tagDao.detachTagFromCertificate(object.getGiftCertificateId(), tag.getId())
-                );
+                List<Tag> alreadyAttachedTags = tagDao.findTagsByGiftCertificateId(object.getGiftCertificateId());
                 //attach new tags
-                tagToAttach.forEach(tag ->
-                        tagDao.attachTagToCertificate(object.getGiftCertificateId(), tag.getId())
+                newTags.forEach(newTag -> {
+                    if (!alreadyAttachedTags.contains(newTag)) {
+                        tagDao.attachTagToCertificate(object.getGiftCertificateId(), newTag.getId());
+                    }
+                });
+                //detach not specified tags
+                alreadyAttachedTags.forEach(tag -> {
+                            if (!newTags.contains(tag)) {
+                                tagDao.detachTagFromCertificate(object.getGiftCertificateId(), tag.getId());
+                            }
+                        }
                 );
                 updatedCertificate = giftCertificateDao.findById(object.getGiftCertificateId());
                 if (updatedCertificate.isPresent()) {
-                    return convertToDto(updatedCertificate.get(), tagToAttach.stream().map(Tag::getName).collect(Collectors.toList()));
+                    return convertToDto(updatedCertificate.get(), newTags.stream().map(Tag::getName).collect(Collectors.toList()));
                 }
             }
         }
@@ -238,7 +244,6 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
         giftCertificate.setDescription(giftCertificateDto.getDescription());
         giftCertificate.setPrice(giftCertificateDto.getPrice());
         giftCertificate.setDuration(giftCertificateDto.getDuration());
-        giftCertificate.setCreateDate(LocalDateTime.parse(giftCertificateDto.getCreateDate()));
         return giftCertificate;
     }
 
@@ -255,18 +260,13 @@ public class GiftCertificateCRUDImpl implements GiftCertificateCRUD {
                 .distinct()
                 .map(Tag::new)
                 .collect(Collectors.toList());
-        List<Tag> existingTags = tagDao.findAll();
         List<Tag> tagsToAttach = new ArrayList<>();
-        uniqueTags.forEach(uniqueTag -> {
-            boolean isAlreadyExists = existingTags.stream().anyMatch(existingTag -> {
-                boolean equalityFlag = existingTag.getName().equals(uniqueTag.getName());
-                if (equalityFlag) {
-                    tagsToAttach.add(existingTag);
-                }
-                return equalityFlag;
-            });
-            if (!isAlreadyExists) {
-                tagDao.create(uniqueTag).ifPresent(tagsToAttach::add);
+        uniqueTags.forEach(newTag -> {
+            Optional<Tag> foundTag = tagDao.findByName(newTag.getName());
+            if (foundTag.isPresent()) {
+                tagsToAttach.add(foundTag.get());
+            } else {
+                tagDao.create(newTag).ifPresent(tagsToAttach::add);
             }
         });
         return tagsToAttach;

@@ -42,22 +42,27 @@ public class TagDaoImpl implements TagDao {
     public Optional<Tag> create(Tag object) {
         Optional<Tag> createdTag = Optional.empty();
         try {
-            Map<String, Object> keys = new SimpleJdbcInsert(this.jdbcTemplate)
+            Long key = new SimpleJdbcInsert(this.jdbcTemplate)
                     .withSchemaName(SCHEMA_NAME)
                     .withTableName(TableNames.TAGS_TABLE)
                     .usingColumns(ColumnNames.NAME)
                     .usingGeneratedKeyColumns(ColumnNames.ID)
-                    .executeAndReturnKeyHolder(new HashMap<String, String>() {{
-                        put(ColumnNames.NAME, object.getName());
-                    }})
-                    .getKeys();
+                    .executeAndReturnKey(new HashMap<String, String>() {{
+                            put(ColumnNames.NAME, object.getName());
+                        }}).longValue();
+//            Map<String, Object> keys = new SimpleJdbcInsert(this.jdbcTemplate)
+//                    .withSchemaName(SCHEMA_NAME)
+//                    .withTableName(TableNames.TAGS_TABLE)
+//                    .usingColumns(ColumnNames.NAME)
+//                    .usingGeneratedKeyColumns(ColumnNames.ID)
+//                    .executeAndReturnKeyHolder(new HashMap<String, String>() {{
+//                        put(ColumnNames.NAME, object.getName());
+//                    }})
+//                    .getKeys();
 
-            long id = 0;
-            if (keys != null && !keys.isEmpty()) {
-                String idString = keys.values().toArray()[0].toString();
-                id = Long.parseLong(idString);
-                createdTag = findById(id);
-            }
+
+                createdTag = findById(key);
+
         } catch (Exception e) {
             createdTag = Optional.empty();
         }

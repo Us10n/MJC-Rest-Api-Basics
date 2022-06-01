@@ -124,3 +124,6 @@ values ('24', '5', '15');
 INSERT INTO module.gift_certificate_tags
 values ('25', '1', '23');
 
+
+SELECT module.gift_certificate_tags.id, count(tag_id) GROUP  BY gift_certificate-tags
+
